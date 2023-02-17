@@ -1,0 +1,40 @@
+import os
+import mpire
+from resize_right import resize
+from PIL import Image
+
+def resize_and_save(input_file, output_folder):
+    # Open the input file and resize it
+    with Image.open(input_file) as img:
+        resized_img = resize(img)
+
+    # Construct the output file path by joining the output folder path and the input file name
+    output_file = os.path.join(output_folder, os.path.basename(input_file))
+
+    # Save the resized image with the best quality
+    resized_img.save(output_file, quality='keep')
+
+def resize_images(input_folder, output_folder):
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Use MPIRE to parallelize the processing of each file
+    with mpire.Pool() as pool:
+        # Get a list of all files in the input folder and its subfolders
+        all_files = []
+        for dirpath, dirnames, filenames in os.walk(input_folder):
+            for filename in filenames:
+                filepath = os.path.join(dirpath, filename)
+                all_files.append(filepath)
+
+        # Apply the resize_and_save() function to each file in the input folder
+        pool.map(resize_and_save, all_files, [output_folder] * len(all_files))
+
+if __name__ == '__main__':
+    # Set the input and output folder paths
+    input_folder = '/path/to/input/folder'
+    output_folder = '/path/to/output/folder'
+
+    # Call the resize_images() function to resize and save all images in the input folder recursively
+    resize_images(input_folder, output_folder)
