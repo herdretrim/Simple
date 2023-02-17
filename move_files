@@ -1,0 +1,18 @@
+import os
+import shutil
+
+def move_files_and_delete_input_folder(input_folder, output_folder):
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    # Move all files from input folder to output folder
+    for filename in os.listdir(input_folder):
+        source_path = os.path.join(input_folder, filename)
+        destination_path = os.path.join(output_folder, filename)
+        if os.path.exists(destination_path):
+            os.remove(destination_path)
+        else: shutil.move(source_path, destination_path)
+    
+    # Delete the input folder
+   # os.rmdir(input_folder)
